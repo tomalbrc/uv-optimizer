@@ -1,4 +1,4 @@
-package org.example;
+package de.tomalbrc;
 
 import org.jetbrains.annotations.NotNull;
 import com.google.gson.JsonDeserializationContext;
@@ -12,6 +12,9 @@ import java.lang.reflect.Type;
 
 public record Key(String namespace, String path) {
     public static Key of(String combined) {
+        if (combined.contains(" ") || !combined.equals(combined.toLowerCase()))
+            throw new IllegalArgumentException("Invalid key " + combined);
+
         if (combined.contains(":")) {
             var split = combined.split(":");
             return new Key(split[0], split[1]);

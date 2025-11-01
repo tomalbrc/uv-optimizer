@@ -1,4 +1,4 @@
-package org.example;
+package de.tomalbrc;
 
 import com.google.gson.*;
 
@@ -14,7 +14,7 @@ public class Model {
     public List<Element> elements;
     public JsonElement display;
 
-    public Set<Key> getTextures() {
+    public Set<Key> getNonParticleTextures() {
         Set<Key> textureKeys = new HashSet<>();
         if (textures != null) {
             for (Map.Entry<String, ModelTexture> entry : textures.entrySet()) {
@@ -49,12 +49,8 @@ public class Model {
                 if (textureString.startsWith("#")) {
                     return new Model.ModelTexture(null, textureString);
                 } else {
-                    try {
-                        Key key = Key.of(textureString);
-                        return new Model.ModelTexture(key, textureString);
-                    } catch (Exception e) {
-                        return new Model.ModelTexture(null, textureString);
-                    }
+                    Key key = Key.of(textureString);
+                    return new Model.ModelTexture(key, textureString);
                 }
             }
         }

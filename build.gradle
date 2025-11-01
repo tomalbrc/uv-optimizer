@@ -1,23 +1,39 @@
 plugins {
     id 'java'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
-group = 'org.example'
-version = '1.0-SNAPSHOT'
+group = 'de.tomalbrc'
+version = '1.0'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.6'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.6'
     implementation 'com.google.code.gson:gson:2.13.2'
     implementation 'org.joml:joml:1.10.8'
-
+    implementation 'commons-io:commons-io:2.20.0'
 
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'de.tomalbrc.Main'
+        )
+    }
+}
+
+shadowJar {
+    archiveClassifier.set("")  // Produces a jar without "-all" suffix
+    manifest {
+        attributes(
+                'Main-Class': 'de.tomalbrc.Main'
+        )
+    }
 }
 
 test {

@@ -1,4 +1,4 @@
-package org.example;
+package de.tomalbrc;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -40,6 +40,10 @@ public class ResourcePack {
     }
 
     public boolean hasTexture(Key key) {
+        return basePath.resolve(key.texturePath()).toFile().exists();
+    }
+
+    public boolean hasTextureMeta(Key key) {
         return basePath.resolve(key.textureMetaPath()).toFile().exists();
     }
 
@@ -69,7 +73,7 @@ public class ResourcePack {
             }
         }
 
-        return new Texture(texturePath, metadata, img);
+        return new Texture(key, texturePath, metadata, img);
     }
 
     public Map<Key, Model> loadModels(Collection<Key> keys) throws IOException {
@@ -93,7 +97,7 @@ public class ResourcePack {
         Model model = getModel(modelKey);
 
         if (model != null) {
-            return model.getTextures();
+            return model.getNonParticleTextures();
         }
 
         return textureKeys;

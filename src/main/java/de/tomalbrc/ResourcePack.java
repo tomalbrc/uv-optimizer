@@ -3,6 +3,7 @@ package de.tomalbrc;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
+import org.apache.commons.io.FilenameUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -105,7 +106,7 @@ public class ResourcePack {
 
     public List<Key> discoverAllModels() throws IOException {
         return discoverResources(".json", path -> {
-            String relativePath = basePath.relativize(path).toString();
+            String relativePath = FilenameUtils.separatorsToUnix(basePath.relativize(path).toString());
 
             String[] parts = relativePath.split("/");
             if (parts.length >= 4 && "assets".equals(parts[0]) && "models".equals(parts[2])) {
@@ -119,7 +120,7 @@ public class ResourcePack {
 
     public List<Key> discoverAllTextures() throws IOException {
         return discoverResources(".png", path -> {
-            String relativePath = basePath.relativize(path).toString();
+            String relativePath = FilenameUtils.separatorsToUnix(basePath.relativize(path).toString());
             String[] parts = relativePath.split("/");
             if (parts.length >= 4 && "assets".equals(parts[0]) && "textures".equals(parts[2])) {
                 String namespace = parts[1];

@@ -102,26 +102,60 @@ public class Optimizer {
         List<Key> allModels = resourcePack.discoverAllModels();
         Map<Key, Set<Key>> textureToModels = new HashMap<>();
 
+        Map<Key, List<Key>> parentToChildren = new HashMap<>();
+        for (Key childKey : allModels) {
+            Model childModel = resourcePack.getModel(childKey);
+            if (childModel == null) continue;
+            if (childModel.parent != null) {
+                parentToChildren.computeIfAbsent(childModel.parent, k -> new ArrayList<>()).add(childKey);
+            }
+        }
+
         for (Key modelKey : allModels) {
             Model model = resourcePack.getModel(modelKey);
 
-            // Basic criteria: model exists, no parent (top-level item model), has elements and has a textures map
             if (model == null || model.parent != null) continue;
             if (model.elements == null || model.elements.isEmpty()) continue;
             if (model.textures == null || model.textures.isEmpty()) continue;
 
+            // if this model is a parent of other models, exclude it UNLESS all children have no elements
+            if (parentToChildren.containsKey(modelKey)) {
+                boolean anyChildHasElements = false;
+                for (Key childKey : parentToChildren.get(modelKey)) {
+                    Model child = resourcePack.getModel(childKey);
+                    if (child != null) {
+                        for (Key key : child.getNonParticleTextures()) {
+                            if (resourcePack.hasTextureMeta(key)) {
+                                anyChildHasElements = true;
+                                break;
+                            }
+                        }
+
+                        if (child.elements != null && !child.elements.isEmpty()) {
+                            anyChildHasElements = true;
+                            break;
+                        }
+                    }
+                }
+                if (anyChildHasElements) {
+                    // skip parent because at least one child defines its own geometry
+                    continue;
+                }
+                // else: all children have no elements -> safe to consider the parent
+            }
+
             Set<Key> nonParticle = model.getNonParticleTextures();
             if (nonParticle == null || nonParticle.isEmpty()) continue;
 
-//            boolean hasMetaTexture = false;
-//            for (Key key : nonParticle) {
-//                hasMetaTexture = resourcePack.hasTextureMeta(key);
-//                if (hasMetaTexture)
-//                    break;
-//            }
-//
-//            if (hasMetaTexture)
-//                continue;
+            boolean hasMetaTexture = false;
+            for (Key key : nonParticle) {
+                hasMetaTexture = resourcePack.hasTextureMeta(key);
+                if (hasMetaTexture)
+                    break;
+            }
+
+            if (hasMetaTexture)
+                continue;
 
             modelCache.put(modelKey, model);
 
